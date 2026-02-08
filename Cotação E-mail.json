@@ -1,0 +1,339 @@
+{
+  "name": "Cotação E-mail",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Tecnologia",
+        "height": 208,
+        "width": 192,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -96
+      ],
+      "id": "1d94ae0d-e9c8-4d00-b775-746957775e2d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Financeiro",
+        "height": 208,
+        "width": 192,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -96
+      ],
+      "id": "e118192d-9c19-4a5a-bdff-74fe6bc93b43",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nova_transacao",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "c3dc30dd-c23b-4554-98d3-6b1c3d8109c7",
+      "name": "Monitora par-moeda",
+      "webhookId": "ae40dc7e-d2f4-49ca-add4-4815bfde5029"
+    },
+    {
+      "parameters": {
+        "url": "=https://economia.awesomeapi.com.br/json/last/{{ $json.body['par-moeda'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        -48
+      ],
+      "id": "cc7fcbc3-ec4b-4d2a-a6dc-dbfbb2a6eab3",
+      "name": "Consultar cotação do par-moeda"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51da21af-d9d6-494e-9d3a-edd884dd4dd2",
+              "name": "valor_convertido",
+              "value": "={{ $json.USDBRL.bid.toNumber().toFixed(2) }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "2fac7435-428b-4f82-bd0e-6098de9a23f9",
+      "name": "Conversão de Dólar x Real"
+    },
+    {
+      "parameters": {
+        "content": "## Saúde",
+        "height": 208,
+        "width": 192,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "5dc07eca-889a-4db2-979a-10f31c005543",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.valor_convertido }}",
+                    "rightValue": 5.95,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "id": "286ffd8e-0899-4242-821a-6be2949874ef"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Não comprar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1af9892a-f295-43a0-b1c8-52c4a007b242",
+                    "leftValue": "={{ $json.valor_convertido }}",
+                    "rightValue": 5.35,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Comprar muito"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -48
+      ],
+      "id": "3c0ceb83-1cc8-4665-9ad2-b90c39b609ee",
+      "name": "Cotação Dólar"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1yYEPhKSH9JZIcaIXreqEbv4yg-bSPd_cTpkNVp1-mQA",
+          "mode": "list",
+          "cachedResultName": "Cotação Dólar",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yYEPhKSH9JZIcaIXreqEbv4yg-bSPd_cTpkNVp1-mQA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Compra",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yYEPhKSH9JZIcaIXreqEbv4yg-bSPd_cTpkNVp1-mQA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data-Hora": "={{ new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }).replace(',', '') }}",
+            "Cotação": "={{ $json.valor_convertido }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data-Hora",
+              "displayName": "Data-Hora",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cotação",
+              "displayName": "Cotação",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        896,
+        -176
+      ],
+      "id": "715c5f1a-4952-4678-a33d-bcd05b059caf",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8sHxouous6GBx0hE",
+          "name": "GoogleAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "Cotação <vnciusazevedo@gmail.com>",
+        "toEmail": "marcusviniciusazevedoc@gmail.com",
+        "subject": "Cotação do Dólar",
+        "html": "=Olá, o dólar está abaixo de R$ 5,95. \n\nCotação atual: <strong>{{ $json.valor_convertido.toString().replace('.',',') }}</strong>\n\nCompre bastante! ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        48
+      ],
+      "id": "7a886588-ca0c-4dd8-a3c8-6a01dc598d50",
+      "name": "Envia e-mail de cotação",
+      "webhookId": "d8f7e3fd-7926-473c-8885-e0f8b79e11c1",
+      "credentials": {
+        "smtp": {
+          "id": "T4Bta0e3kaocFG1V",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "#### Observação\n- Acesse [REQBIN](https://reqbin.com/)\n- Cole a [URL](http://localhost:5678/webhook-test/nova_transacao)\n- Em Body o parâmetro {\"par-moeda\":\"USD-BRL\"}",
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "9e6ee7f0-426c-4027-bf5d-ba7e64932f07",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Monitora par-moeda": {
+      "main": [
+        [
+          {
+            "node": "Consultar cotação do par-moeda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar cotação do par-moeda": {
+      "main": [
+        [
+          {
+            "node": "Conversão de Dólar x Real",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversão de Dólar x Real": {
+      "main": [
+        [
+          {
+            "node": "Cotação Dólar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cotação Dólar": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Envia e-mail de cotação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "2852992f-86d0-43d5-ad58-a9c94acccf9e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38a4c4243d3bfa3ecd097c317b3f5c34365a5cf71330860848229ff6f6851446"
+  },
+  "id": "MB8r3F4rrfmxaOG5",
+  "tags": []
+}

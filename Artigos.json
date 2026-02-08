@@ -1,0 +1,352 @@
+{
+  "name": "Artigos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "bac65d30-1de3-467c-bf27-fcee1e56fd7b",
+      "name": "Seg à Sex no horário das 9AM"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1uE3feWupyAjvrpA5lNBlv8TtFehH8xFbFEqQAUjT8-k",
+          "mode": "list",
+          "cachedResultName": "Artigos 320",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uE3feWupyAjvrpA5lNBlv8TtFehH8xFbFEqQAUjT8-k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uE3feWupyAjvrpA5lNBlv8TtFehH8xFbFEqQAUjT8-k/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Não enviado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        0
+      ],
+      "id": "fcd944b3-a31c-4bf1-a2b5-fcbeeffb4be9",
+      "name": "Obtém artigos não enviados",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VCnrlGzfDPB3kKPN",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        368,
+        0
+      ],
+      "id": "f8e3c9bf-744f-4c74-be93-efe2011dd1ba",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "chatId": "@conhecimentos320",
+        "text": "=**{{ $json['Título'] }}**\n\n_{{ $json['Descrição'] }}_\n\n{{ $json.URL }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "27456ad0-c77d-47c8-9c09-f5a903677af7",
+      "name": "Envia o artigo no Telegram",
+      "webhookId": "77c59ed0-6519-4d5a-9e86-5132573e4d07",
+      "credentials": {
+        "telegramApi": {
+          "id": "SbkrwzDaGjh0RGpW",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fcd94d74-4853-40d3-bd46-694809eb3e85",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        816,
+        0
+      ],
+      "id": "d22e23a7-0294-495e-8dbd-2ba11e3868a4",
+      "name": "Foi enviado com sucesso?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1uE3feWupyAjvrpA5lNBlv8TtFehH8xFbFEqQAUjT8-k",
+          "mode": "list",
+          "cachedResultName": "Artigos 320",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uE3feWupyAjvrpA5lNBlv8TtFehH8xFbFEqQAUjT8-k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uE3feWupyAjvrpA5lNBlv8TtFehH8xFbFEqQAUjT8-k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Limit').item.json.row_number }}",
+            "Título": "",
+            "Status": "Enviado"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Título",
+              "displayName": "Título",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Descrição",
+              "displayName": "Descrição",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        -96
+      ],
+      "id": "52c302cb-dfa3-46bc-a1f3-d6fcf4bae468",
+      "name": "Atualiza a planilha para status enviado",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VCnrlGzfDPB3kKPN",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "https://teste.uzapi.com.br:3333/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "sessionkey",
+              "value": "Marcus"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "Marcus"
+            },
+            {
+              "name": "number",
+              "value": "5521998410888"
+            },
+            {
+              "name": "text",
+              "value": "=O artigo *{{ $('Limit').item.json['Título'] }}*\nfoi enviado com sucesso no Telegram.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1328,
+        128
+      ],
+      "id": "dbecdcc6-ad42-45c5-8e30-a00d5e568900",
+      "name": "Notifica a 320 do envio com sucesso no Telegram"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Seg à Sex no horário das 9AM": {
+      "main": [
+        [
+          {
+            "node": "Obtém artigos não enviados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtém artigos não enviados": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Envia o artigo no Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia o artigo no Telegram": {
+      "main": [
+        [
+          {
+            "node": "Foi enviado com sucesso?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Foi enviado com sucesso?": {
+      "main": [
+        [
+          {
+            "node": "Atualiza a planilha para status enviado",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notifica a 320 do envio com sucesso no Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "079b4f06-a44e-4a9a-aa52-cb042ce6eb9c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38a4c4243d3bfa3ecd097c317b3f5c34365a5cf71330860848229ff6f6851446"
+  },
+  "id": "etF1DZgAbn1_5Vh_WU7-2",
+  "tags": []
+}

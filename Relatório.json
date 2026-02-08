@@ -1,0 +1,159 @@
+{
+  "name": "Relatório",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fc3d1a7c-5951-4fcb-8fdc-8be646c77e4a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAllPeople",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.n8nTrainingCustomerDatastore",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "58036ed6-3169-49de-84ec-e43055f59828",
+      "name": "Customer Datastore (n8n training)"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "usuarios"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "a5aaaadf-c307-4273-9b26-e47e1784e5a7",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fromEmail": "marcusvnciussantos@gmail.com",
+        "toEmail": "marcusviniciusazevedoc@gmail.com",
+        "subject": "Lista de usuários",
+        "html": "=Olá, Marcus. Tudo bem? Segue o relatório dos últimos usuários da plataforma:\n\n{{ $json.usuarios.join('\\n\\n ----------------------------- \\n\\n') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "aa8e3b9f-f53c-48ae-9501-847653113808",
+      "name": "Send email",
+      "webhookId": "75429353-ce6d-44cc-93a1-39a6311bff27",
+      "credentials": {
+        "smtp": {
+          "id": "T4Bta0e3kaocFG1V",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b57b7233-f621-4761-98b3-ecca4a9e2441",
+              "name": "usuarios",
+              "value": "=<br><br>\n<strong>ID:</strong> {{ $json.id }}<br>\n<strong>Nome:</strong> {{ $json.name }}<br>\n<strong>E-mail:</strong> {{ $json.email }}<br>\n<strong>Observações:</strong> {{ $json.notes }}<br>\n<strong>País:</strong> {{ $json.country }}<br>\n<strong>Criado em:</strong> {{ $json.created.split('-').reverse().join('/') }}\n<br><br>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "84b7d84e-3807-4bb9-9ee2-d440015f559b",
+      "name": "Lista de Usuários"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Customer Datastore (n8n training)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Datastore (n8n training)": {
+      "main": [
+        [
+          {
+            "node": "Lista de Usuários",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lista de Usuários": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "e0b21236-816e-4d14-9b38-7acbd645560c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38a4c4243d3bfa3ecd097c317b3f5c34365a5cf71330860848229ff6f6851446"
+  },
+  "id": "H9_XMoaYkUGQ_Z04ecHmj",
+  "tags": []
+}

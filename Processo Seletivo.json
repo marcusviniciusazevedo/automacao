@@ -1,0 +1,300 @@
+{
+  "name": "Processo Seletivo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 14,
+              "triggerAtHour": 21
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "9031a483-4ec7-40cb-a82a-7b3cccfa5910",
+      "name": "Dispara no dia 14/10/25 às 9AM"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DlWm-tQMwnzJ_Fw8jof8qWCfEBWSbyTManw260naKzM",
+          "mode": "list",
+          "cachedResultName": "Processo Seletivo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DlWm-tQMwnzJ_Fw8jof8qWCfEBWSbyTManw260naKzM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Candidatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DlWm-tQMwnzJ_Fw8jof8qWCfEBWSbyTManw260naKzM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "9d399858-ebac-414c-84b2-3ec198e37544",
+      "name": "Obtém candidatos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8sHxouous6GBx0hE",
+          "name": "GoogleAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b7192e4c-0b77-4c5c-a56c-6aec60ac9971",
+              "leftValue": "={{ $json['Anos Experiência'] }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "32189aac-7882-4cfc-8fb3-bcae9e1c7a97",
+              "leftValue": "={{ $json['Grau Escolaridade'] }}",
+              "rightValue": "Superior",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "067385dd-c545-4cff-9d18-f3ee876ada97",
+      "name": "Candidato Aprovado?"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        720,
+        -192
+      ],
+      "id": "87f708c4-a822-4194-8458-270338cac684",
+      "name": "Para cada candidato"
+    },
+    {
+      "parameters": {
+        "fromEmail": "Recrutador <vnciusazevedo@gmail.com>",
+        "toEmail": "={{ $json['E-mail'] }}",
+        "subject": "Resultado do processo seletivo",
+        "emailFormat": "text",
+        "text": "=Olá, {{ $json.Nome.split(' ')[0] }}. Tudo bem? \nVocê foi aprovado para a próxima fase do processo seletivo.\nParabéns!",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "4cf6f3ec-f0bf-4acb-891b-2b54216f5f16",
+      "name": "Envia email de aprovação",
+      "webhookId": "2e967b44-0f9a-4315-a9a2-17a115de5ee4",
+      "credentials": {
+        "smtp": {
+          "id": "T4Bta0e3kaocFG1V",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "577758ee-c306-42a4-aad8-44fb7ba0d55f",
+      "name": "Aguardar 5s",
+      "webhookId": "95ed26be-8806-4f3e-8e58-929237fc2915"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Nome"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "86a0a70d-b0d7-4c72-b88b-3eefe80b3c3b",
+      "name": "Gera array de nomes"
+    },
+    {
+      "parameters": {
+        "fromEmail": "Recrutador <vnciusazevedo@gmail.com>",
+        "toEmail": "marcusviniciusazevedoc@gmail.com",
+        "subject": "Candidatos reprovados",
+        "emailFormat": "text",
+        "text": "=Olá, colaborador Marcus.\nSeguem os nomes dos candidatos reprovados.\n{{ '- ' + $json.Nome.join('\\n- ') }}\n\nAtenciosamente,\nRecrutador",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        912,
+        48
+      ],
+      "id": "b0d73b69-46de-4feb-8fe5-a4ea3eb8cc3e",
+      "name": "Envia lista de candidatos reprovados",
+      "webhookId": "c5990713-1b75-4604-9019-f7fafcfcb7f7",
+      "credentials": {
+        "smtp": {
+          "id": "T4Bta0e3kaocFG1V",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Dispara no dia 14/10/25 às 9AM": {
+      "main": [
+        [
+          {
+            "node": "Obtém candidatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtém candidatos": {
+      "main": [
+        [
+          {
+            "node": "Candidato Aprovado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Candidato Aprovado?": {
+      "main": [
+        [
+          {
+            "node": "Para cada candidato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gera array de nomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Para cada candidato": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Envia email de aprovação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia email de aprovação": {
+      "main": [
+        [
+          {
+            "node": "Aguardar 5s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aguardar 5s": {
+      "main": [
+        [
+          {
+            "node": "Para cada candidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gera array de nomes": {
+      "main": [
+        [
+          {
+            "node": "Envia lista de candidatos reprovados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "beac298e-bf8e-4ba4-a3e0-b1be8b1257af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "38a4c4243d3bfa3ecd097c317b3f5c34365a5cf71330860848229ff6f6851446"
+  },
+  "id": "IZMEnCxvIl7B8st21a2r_",
+  "tags": []
+}
