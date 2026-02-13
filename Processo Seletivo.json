@@ -8,7 +8,7 @@
             {
               "field": "months",
               "triggerAtDayOfMonth": 14,
-              "triggerAtHour": 21
+              "triggerAtHour": 9
             }
           ]
         }
@@ -290,7 +290,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "beac298e-bf8e-4ba4-a3e0-b1be8b1257af",
+  "versionId": "8ffdb9b3-2df3-4e24-8ede-a4d4b8de79ed",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "38a4c4243d3bfa3ecd097c317b3f5c34365a5cf71330860848229ff6f6851446"
